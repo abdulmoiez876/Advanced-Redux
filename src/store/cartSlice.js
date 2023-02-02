@@ -40,6 +40,29 @@ const cartSlice = createSlice({
                 itemToRemove.totalPrice = itemToRemove.totalPrice - itemToRemove.price;
             }
         },
+        incrementProduct(state, action) {
+            const incrementId = action.payload;
+
+            state.cartTotal ++;
+            const incrementProduct = state.cartItems.find(cartItem => cartItem.id === incrementId);
+
+            incrementProduct.quantity ++;
+            incrementProduct.totalPrice += incrementProduct.price;
+        },
+        decrementProduct(state, action) {
+            const decrementId = action.payload;
+
+            state.cartTotal --;
+            const decrementProduct = state.cartItems.find(cartItem => cartItem.id === decrementId);
+
+            if(decrementProduct.quantity === 1) {
+                state.cartItems = state.cartItems.filter(cartItem => cartItem.id !== decrementId)
+            }
+            else {
+                decrementProduct.quantity --;
+                decrementProduct.totalPrice -= decrementProduct.price;
+            }
+        }
     }
 })
 
