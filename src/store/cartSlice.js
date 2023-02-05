@@ -4,13 +4,19 @@ const cartSlice = createSlice({
     name: 'cart',
     initialState: {
         cartItems: [],
-        cartTotal: 0
+        cartTotal: 0,
+        changed: false
     },
     reducers: {
+        replaceCart(state, action) {
+            state.cartItems = action.payload.cartItems;
+            state.cartTotal = action.payload.cartTotal;
+        },
         addItemToCart(state, action) {
             const newItem = action.payload;
             const existingItem = state.cartItems.find(cartItem => cartItem.id === newItem.id);
             state.cartTotal ++;
+            state.changed = true;
 
             if(!existingItem) {
                 state.cartItems.push({
@@ -28,6 +34,7 @@ const cartSlice = createSlice({
         },
         removeItemFromCart(state, action) {
             const idToRemove = action.payload;
+            state.changed = true;
 
             const itemToRemove = state.cartItems.find(id => id === idToRemove);
             state.cartTotal --;
@@ -44,6 +51,7 @@ const cartSlice = createSlice({
             const incrementId = action.payload;
 
             state.cartTotal ++;
+            state.changed = true;
             const incrementProduct = state.cartItems.find(cartItem => cartItem.id === incrementId);
 
             incrementProduct.quantity ++;
@@ -53,6 +61,7 @@ const cartSlice = createSlice({
             const decrementId = action.payload;
 
             state.cartTotal --;
+            state.changed = true;
             const decrementProduct = state.cartItems.find(cartItem => cartItem.id === decrementId);
 
             if(decrementProduct.quantity === 1) {
@@ -87,8 +96,33 @@ const sendCartData = (cartData) => {
     }
 }
 
+const fetchCartData = () => {
+    console.log('fetching data...');
+    return async (dispatch) => {
+        try {
+            fetch('https://advanced-redux-50bfc-default-rtdb.firebaseio.com/cart.json')
+            .then(async (response) => {
+                const data = await response.json();
+                console.log('fetched successfully');
+                dispatch(cartActions.replaceCart({
+                    cartItems: data.cartItems || [],
+                    cartTotal: data.cartTotal || 0,
+                    changed: data.changed || false
+                }));
+            })
+            .catch((err) => {
+                console.log('error fetching');
+            })
+        }
+        catch(err) {
+            console.log(err);
+        }
+    }
+}
+
 export {
     cartActions,
-    sendCartData
+    sendCartData,
+    fetchCartData
 }
 export default cartSlice;
