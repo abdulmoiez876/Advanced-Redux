@@ -66,5 +66,29 @@ const cartSlice = createSlice({
     }
 })
 
-export const cartActions = cartSlice.actions;
+const cartActions = cartSlice.actions;
+
+const sendCartData = (cartData) => {
+    console.log('sending');
+    return async () => {
+        try {
+            fetch('https://advanced-redux-50bfc-default-rtdb.firebaseio.com/cart.json', {
+                method: 'PUT',
+                body: JSON.stringify(cartData)
+            }).then((response) => {
+                console.log('Success');
+            }).catch((error) => {
+                console.log('try again');
+            })
+        }
+        catch(err) {
+            console.log(err);
+        }
+    }
+}
+
+export {
+    cartActions,
+    sendCartData
+}
 export default cartSlice;
